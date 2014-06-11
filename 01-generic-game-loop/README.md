@@ -291,3 +291,128 @@ boolean sleep;
 long updateTime;
 long drawTime;
 ```
+
+And the onLoop implementation:
+
+```java
+boolean onLoop( Game game, GameState state, GameInput input, Graphics2D gr ) {
+  long nanosElapsed = state.tick();
+  updateTime += nanosElapsed;
+  int updateCount = 0;
+  while (updateTime >= updateRate && updateCount < maxUpdates) {
+    game.input( input );
+    input.clear();
+    if (!game.isPlaying()) {
+      return false;
+    }
+    state.update();
+    game.update( state );
+    if (!game.isPlaying()) {
+      return false;
+    }
+    updateCount++;
+    updateTime -= updateRate;
+  }
+  drawTime += nanosElapsed;
+  int drawCount = 0;
+  if (drawTime >= drawRate || updateCount > 0) {
+    state.interpolate = getStateInterpolation();
+    state.forward = state.interpolate * state.seconds;
+    state.backward = state.forward - state.seconds;
+    state.draw();
+    game.draw( state, gr );
+    drawCount++;
+    drawTime -= (drawRate == 0 ? drawTime : drawRate);
+  }
+  if (sleep && drawCount == 0 && updateCount == 0) {
+    long actualTime = updateTime + state.getElapsedSinceTick();
+    long sleep = (updateRate - actualTime) / 1000000L;
+    if (sleep > 1) {
+      try {
+        Thread.sleep( sleep - 1 );
+      } catch (Exception e) { }
+    }
+  }
+  return (drawCount > 0);
+}
+```
+
+I’ll let you figure out how that works, it’s very similar to GameLoopIntepolated.
+
+#### Smooth drawing technique
+Onto the final topic, *smooth drawing*! This is a technique you only need to do for fixed time step game loops, since you are drawing more than you are updating (in most cases). Without smooth drawing your objects will skip across the screen, it’s an ugly sight (unless you have high update’s per second, you MIGHT not be able to notice it).
+
+The typical smooth drawing algorithm is called interpolation. Your drawing calculations look like this:
+
+```java
+drawPosition = (position - lastPosition) * state.interpolate + lastPosition;
+```
+
+![interpolation](images/interpolation.png)
+
+*Positives*
+- Your object will never appear to collide with another object.
+- 
+*Negatives*
+- This requires you to save the lastPosition for the object.
+- This will draw the object “behind” where it was in the last update. In the worst case, the object’s position on the screen could be “updateInterval” behind.
+
+The next drawing algorithm I call backward extrapolation. The drawing calculations look like this:
+
+```java
+drawPosition = position + state.backward * velocity;
+```
+
+![backward](images/backward.png)
+
+*Positives*
+- You don’t need to save lastPosition.
+
+*Negatives*
+- This will draw the object “behind” where it was in the last update. In the worst case, the object’s position on the screen could be “updateInterval” behind.
+- The object will be “back in time” where the object was based on its velocity… but since the velocity can change when a collision occurs, the object could be visually placed in the collided object when it’s moving away from it.
+
+The final drawing algorithmm I call forward extrapolation. The drawing calculations look like this:
+
+```java
+drawPosition = position + state.forward * velocity;
+```
+
+![forward](images/forward.png)
+
+*Positives*
+- You don’t need to save lastPosition.
+- Visually, the objects will be most up-to-date with the current state of the game.
+
+*Negatives*
+- This will draw the object “ahead” where it’s supposed to be. In worst case the object’s position on the screen could be “updateInterval” ahead.
+- The object will be “forward in time” where the object could be (if it doesn’t collide with anything). If it collides with anything in the next update call, it may appear to penetrate the object.
+
+Overall I don’t have a preference between these three algorithms, which one you use is dependent on the game type. Once you define your update rate and draw rate goals, picking the smooth drawing algorithm that looks the nicest for your game is the next step!
+
+*Notes*
+- If you set the position of an entity to some value (opposed to incrementing by velocity), you need to set lastPosition to that value as well. If you don’t you could have entities teleporting across the screen.
+- These interpolation methods are linear (also known as lerp), for angles you need to use spherical interpolation (also known as slerp)
+- These interpolation methods will not work for complex structures like matrices and quaternions, other equations are used to interpolate these structures.
+
+I hope this helps you! The example code is available to download, and there is an applet you can expirement with. The applet lets you change your game loop implementation while the game is running, and you can toggle through the different smooth drawing methods to see how they perform.
+
+If you have any questions, please ask away!
+
+## Expanding
+
+The update and drawing code presented here uses what’s called Euler integration.  Other integration methods like Verlet and Runge-Kutta (RK4) could be used and subsequently you could develop a better smooth drawing algorithm for those integration methods (one that doesn’t result in penetration and is visually more accurrate to the current state of the game).
+
+## Code Download
+
+The code was written in Java and uses Java2D for drawing. Java2D was chosen because it is part of the Java SDK and it doesn’t require any external libraries. This code is easily translatable to other languages and other graphics libraries.
+
+[Source Code][download/GameProgBlog-Article-Loop.zip]
+
+## Applet
+
+[Applet][download/loop.jar]
+
+## Next Article
+
+In the next article I’m going to talk about managing game entities. Managing (updating & drawing) lists and layers of game entities is non-trivial to the beginner, and could be improved upon even for the experienced. This article will go over a quick method that has no overhead when adding and removing entities to and from your game.
