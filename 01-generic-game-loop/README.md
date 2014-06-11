@@ -407,11 +407,11 @@ The update and drawing code presented here uses what’s called Euler integratio
 
 The code was written in Java and uses Java2D for drawing. Java2D was chosen because it is part of the Java SDK and it doesn’t require any external libraries. This code is easily translatable to other languages and other graphics libraries.
 
-[Source Code][download/GameProgBlog-Article-Loop.zip]
+[Source Code](download/GameProgBlog-Article-Loop.zip)
 
 ## Applet
 
-[Applet][download/loop.jar]
+[Applet](download/loop.jar)
 
 ## Next Article
 
