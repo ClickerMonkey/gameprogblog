@@ -416,3 +416,28 @@ The code was written in Java and uses Java2D for drawing. Java2D was chosen beca
 ## Next Article
 
 In the next article I’m going to talk about managing game entities. Managing (updating & drawing) lists and layers of game entities is non-trivial to the beginner, and could be improved upon even for the experienced. This article will go over a quick method that has no overhead when adding and removing entities to and from your game.
+
+<a id="toggleApplet" href="javascript:toggleApplet()">Show</a>
+<div id="appletWindow"></div>
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+function toggleApplet() {
+  var link = jQuery("#toggleApplet");
+  var container = jQuery("#appletWindow");
+  if ( link.text() == 'Show' ) {
+    var applet = jQuery('<applet></applet>');
+    applet.attr({
+      archive: "http://www.gameprogblog.com/wp-content/uploads/2013/01/loop.jar",
+      code: "com.gameprogblog.TestGameApplet.class",
+      width: 640,
+      height: 480
+    });
+    container.append( applet );
+    link.text( 'Hide' );
+  } else {
+    container.empty();
+    link.text( 'Show' );
+  }
+}
+//--><!]]>
+</script>
