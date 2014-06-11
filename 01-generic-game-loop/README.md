@@ -352,7 +352,7 @@ drawPosition = (position - lastPosition) * state.interpolate + lastPosition;
 
 *Positives*
 - Your object will never appear to collide with another object.
-- 
+
 *Negatives*
 - This requires you to save the lastPosition for the object.
 - This will draw the object “behind” where it was in the last update. In the worst case, the object’s position on the screen could be “updateInterval” behind.
