@@ -563,51 +563,51 @@ I hope you realize the usefulness of organizing your world into EntityLayers!
 
 #### Alternative Data Structures
 
-Here are a few data structures commonly used by me in different scenarios. I’ve included notable positives, negatives, and neutral remarks for each one.
+Here are a few data structures commonly used by me in different scenarios. I’ve included notable `+` positives, `-` negatives, and `~` neutral remarks for each one.
 
 **Singly Linked List** (a typical LinkedList implementation like java.util.LinkedList)
-* Removal involves iterating over the list until the entity is found.
-* Not as processor friendly as an array-based structure.
-* Requires constant allocation of nodes for every entity added (could use a node cache).
-* Uses only required space.
+* `-` Removal involves iterating over the list until the entity is found.
+* `-` Not as processor friendly as an array-based structure.
+* `-` Requires constant allocation of nodes for every entity added (could use a node cache).
+* `+` Uses only required space.
 
 **Self-Pruning Linked List**
-* Not as processor friendly as an array-based structure.
-* Requires constant allocation of nodes for every entity added (although could use a node cache).
-* Uses only required space.
-* Removal is done during iteration, like our EntityList.
+* `-` Not as processor friendly as an array-based structure.
+* `-` Requires constant allocation of nodes for every entity added (although could use a node cache).
+* `+` Uses only required space.
+* `+` Removal is done during iteration, like our EntityList.
 
 **Doubly Linked List**
-* Not as processor friendly as an array-based structure.
-* Requires constant allocation of nodes for every entity added (although could use a node cache).
-* Uses twice required space (since another node reference is required).
-* Removal can be done as soon as expire() is called, no need for pruning.
-* I use this for index’s in spatial databases. A spatial entity has a single doubly linked node which it uses throughout it’s life. The index’s of the spatial database each are a linked list consisting of the nodes of the entities in that index (and index may be a rectangle in space where it’s entities are entities in the rectangle).
+* `-` Not as processor friendly as an array-based structure.
+* `-` Requires constant allocation of nodes for every entity added (although could use a node cache).
+* `-` Uses twice required space (since another node reference is required).
+* `+` Removal can be done as soon as expire() is called, no need for pruning.
+* `~` I use this for index’s in spatial databases. A spatial entity has a single doubly linked node which it uses throughout it’s life. The index’s of the spatial database each are a linked list consisting of the nodes of the entities in that index (and index may be a rectangle in space where it’s entities are entities in the rectangle).
 
 **Self-Pruning Binary Tree** (something I’ve used for implementing a Scene Graph)
-* Not as processor friendly as an array-based structure.
-* Requires constant allocation of nodes for every entity added (although could use a node cache).
-* Uses twice required space (since another node reference is required).
-* Has layering built in.
-* Great for Scene Graph implementation.
-* Insertion is trickier since layer’s are involved. Typically insertion isn’t done on a tree in the same sense. The tree is built in such a way that insertion doesn’t require traversing the tree and finding the appropriate node.
-* The “left” node is the sibling to the current node. The “right” node is the first child node. When updating and drawing you iterate over the children and call draw/update. They do the same thing for.
+* `-` Not as processor friendly as an array-based structure.
+* `-` Requires constant allocation of nodes for every entity added (although could use a node cache).
+* `-` Uses twice required space (since another node reference is required).
+* `+` Has layering built in.
+* `+` Great for Scene Graph implementation.
+* `~` Insertion is trickier since layer’s are involved. Typically insertion isn’t done on a tree in the same sense. The tree is built in such a way that insertion doesn’t require traversing the tree and finding the appropriate node.
+* `~` The “left” node is the sibling to the current node. The “right” node is the first child node. When updating and drawing you iterate over the children and call draw/update. They do the same thing for.
 
 **Array List** (a typical List implementation like java.util.ArrayList)
-* Removal involves iterating over the list until the entity is found.
-* May have wasted space in the array.
-* More processor friendly than a linked structure.
+* `-` Removal involves iterating over the list until the entity is found.
+* `-` May have wasted space in the array.
+* `+` More processor friendly than a linked structure.
 
 **Self-Pruning List** (hey, that’s what we just implemented! I wanted to re-iterate it)
-* May have wasted space in the array.
-* More processor friendly than a linked structure.
+* `-` May have wasted space in the array.
+* `+` More processor friendly than a linked structure.
 
 **Back-Copying List**
-* May have wasted space in the array.
-* Does not preserve insertion order.
-* More processor friendly than a linked structure.
-* Less copying than a Self-Pruning List.
-* Instead of copying the live entities over the expired ones (like Self-Pruning List), the last entity in the list is copied over the recently expired entity. This results in far less copying but insertion order is not maintained. This is easily implemented by iterating over the entities starting from the back and moving towards the front.
+* `-` May have wasted space in the array.
+* `-` Does not preserve insertion order.
+* `+` More processor friendly than a linked structure.
+* `+` Less copying than a Self-Pruning List.
+* `~` Instead of copying the live entities over the expired ones (like Self-Pruning List), the last entity in the list is copied over the recently expired entity. This results in far less copying but insertion order is not maintained. This is easily implemented by iterating over the entities starting from the back and moving towards the front.
 
 ## Expanding
 
